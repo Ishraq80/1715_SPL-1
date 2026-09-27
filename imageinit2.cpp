@@ -4,6 +4,66 @@
 
 using namespace std;
 
+bool readPGM(const string& filename, vector<uint8_t>& image, int& width, int& height)
+{
+    ifstream file(filename, ios::binary);
+
+    if (!file)
+    {
+        cerr << "Could not open PGM file: " << filename << endl;
+        return false;
+    }
+
+    string magic;
+    file >> magic;
+
+    if (magic != "P5")
+    {
+        cerr << "Not a binary PGM file: " << filename << endl;
+        return false;
+    }
+
+    file >> width >> height;
+
+    int max_value;
+    file >> max_value;
+
+    file.get();
+
+    image.resize(width * height);
+
+    file.read(reinterpret_cast<char*>(image.data()), image.size());
+
+    if (!file)
+    {
+        cerr << "Error reading PGM data: " << filename << endl;
+        return false;
+    }
+
+    return true;
+}
+
+
+
+bool savePGM(const string& filename, const vector<uint8_t>& image, int width, int height)
+{
+    ofstream file(filename, ios::binary);
+
+    if (!file)
+    {
+        cerr << "Could not create PGM file: " << filename << endl;
+        return false;
+    }
+
+    file << "P5\n";
+    file << width << " " << height << "\n";
+    file << "255\n";
+
+    file.write(reinterpret_cast<const char*>(image.data()), image.size());
+
+    return true;
+}
+
 int main() {
     const char* filename = "file1.svs";
 
